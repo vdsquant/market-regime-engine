@@ -68,7 +68,7 @@ Outputs include:
 - volatility characteristics by regime  
 - transition dynamics (in later days)
 
-Day 1 focuses only on core inference.
+Phase 1 focuses only on core inference.
 
 ---
 
@@ -149,20 +149,20 @@ Interpretation (to be refined in Day 2+):
 
 ## Roadmap
 
-### Day 2 — Multi-factor Input
+### 2 — Multi-factor Input
 - Add FTSE volatility  
 - Add macro factors (CPI, PMI, unemployment)  
 - Construct multi‑dimensional HMM input  
 
-### Day 3 — Regime Visualisation
+### 3 — Regime Visualisation
 - Regime‑coloured FTSE chart  
 - Transition matrices & stationary probabilities  
 
-### Day 4 — Backtesting
+### 4 — Backtesting
 - Regime‑based asset allocation rules  
 - Sharpe, drawdown, turnover metrics  
 
-### Day 5 — Packaging
+### 5 — Packaging
 - Publish as Python package  
 - Add command‑line interface  
 - Add Docker container  
