@@ -1,133 +1,185 @@
-Market Regime Engine (UK Edition)
 
-A modular Python project that detects market regimes using:
+# Market Regime Engine (UK Edition)
 
-PCA on UK gilt ETF proxies (yield curve movements)
-Hidden Markov Models (HMM) on FTSE 100 returns
-Clean feature engineering and plotting utilities
-Production-ready folder structure (src/ modules)
+## Overview
+The **Market Regime Engine (UK Edition)** is a modular quantitative research project designed to detect latent market regimes in UK financial markets.  
+The system integrates:
+- **Principal Component Analysis (PCA)** on UK gilt ETF proxies to extract yield-curve factors  
+- **Gaussian Hidden Markov Models (HMMs)** on FTSE 100 returns to infer hidden regimes  
+- A clean, extensible `src/` architecture for future model expansion  
 
-This is Day 1 of a multi-stage build that will evolve into a complete market-regime detection engine.
+This project represents **Day 1** of a multi-stage build that will evolve into a full-featured market regime research and backtesting framework.
 
-Features (Day 1 MVP)
-UK Gilt Yield Curve Processing
-Uses UK gilt ETF proxies from Yahoo Finance:
-IGLS → Short-term (proxy for 2Y)
-IGLT → Medium term (proxy for 5Y)
-GLTL → Long term (proxy for 10Y)
+---
 
-Daily close prices converted into a yield-curve feature matrix
-PCA applied to extract:
-PC1 — Level
-PC2 — Slope
-PC3 — Curvature
+## Research Motivation
+Financial markets often operate under **unobservable regimes** (e.g., calm, volatile, stressed). Detecting these states enhances:
+- risk management  
+- allocation decisions  
+- asset-pricing insights  
+- macro-financial interpretation  
 
-FTSE 100 Data Loader
+The PCA + HMM approach follows established literature (Hamilton, 1989; Ang & Piazzesi, 2003; Guidolin & Timmermann, 2007) and provides a robust foundation for empirical regime-switching analysis.
 
-Fetches FTSE (^FTSE) price history
-Computes daily returns
+---
 
-Hidden Markov Model (HMM)
-Gaussian HMM with 3 states
-Fitted on FTSE returns
-Outputs hidden state sequence (regimes)
+## Data Sources
 
-Visualisations
-PCA loading plots
-Yield curve component behavior
+### Yield Curve Proxies (UK ETFs)
+Due to limited long-term availability of actual UK gilt yield curve data, the project uses liquid bond ETFs as proxies:
 
-Project Structure
+| ETF  | Proxy for | Approx Tenor |
+|------|-----------|--------------|
+| IGLS | Short end | 2Y |
+| IGLT | Mid curve | 5Y |
+| GLTL | Long end | 10Y |
 
+Daily close prices are differenced to obtain yield-curve innovations used in PCA.
+
+### Equity Index
+- **FTSE 100 Index (^FTSE)**  
+Daily returns form the observation series for the Day‑1 HMM.
+
+---
+
+## Methodology
+
+### 1. Principal Component Analysis (PCA)
+PCA is applied to **daily yield-curve changes** rather than levels to avoid artificial correlation dominance.  
+Interpretable factors typically emerge:
+
+1. **PC1 — Level**  
+2. **PC2 — Slope**  
+3. **PC3 — Curvature**
+
+These factors summarise most systematic movements of the gilt curve.
+
+---
+
+### 2. Hidden Markov Model (HMM)
+A 1‑dimensional Gaussian HMM is fitted to FTSE returns:
+
+\[
+r_t \sim \mathcal{N}(\mu_{s_t}, \sigma_{s_t}^2), \quad s_t \in \{0,1,2\}
+\]
+
+Outputs include:
+- filtered regime sequence  
+- volatility characteristics by regime  
+- transition dynamics (in later days)
+
+Day 1 focuses only on core inference.
+
+---
+
+## Project Structure
+
+```
 market-regime-engine/
 │
 ├── src/
-│   ├── data_loader.py      # Fetches UK gilt ETFs + FTSE index
-│   ├── pca_model.py        # PCA model for yield curve factors
-│   ├── hmm_model.py        # Hidden Markov Model implementation
-│   ├── plots.py            # PCA loading plots
+│   ├── data_loader.py       # UK ETFs + FTSE loader
+│   ├── pca_model.py         # PCA extraction
+│   ├── hmm_model.py         # Gaussian HMM
+│   ├── plots.py             # PCA loading plots
 │   └── __init__.py
 │
-├── main.py                 # Day 1 pipeline runner
-├── requirements.txt         # Python dependencies
-├── .gitignore               # venv + cache ignored
-└── README.md                # You are here
+├── main.py                  # Day‑1 pipeline
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
 
-Installation
-1. Clone the repository
+---
+
+## Installation
+
+### Clone repository
+```bash
 git clone https://github.com/vdsquant/market-regime-engine.git
 cd market-regime-engine
+```
 
-2. Create a Python environment
+### Create environment
+```bash
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+venv\Scripts\activate     # Windows  
+source venv/bin/activate    # macOS/Linux
+```
 
-3. Install dependencies
+### Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
-Run the Project
+---
+
+## Running the Day‑1 Pipeline
+
+```bash
 python main.py
+```
 
-This executes the Day-1 pipeline:
+Pipeline steps:
+1. Download UK gilt ETF data and FTSE index  
+2. Compute PCA on gilt-curve innovations  
+3. Plot PCA loadings  
+4. Compute FTSE returns  
+5. Fit a 3‑state Gaussian HMM  
+6. Print initial regime sequence  
 
-Load UK gilt ETFs
-Run PCA
-Plot PCA loadings
-Load FTSE returns
-Fit HMM
-Print first 20 hidden states
+---
 
-Example Output
-PCA Explained Variance
-Indicates how much of the yield curve movement each principal component explains.
+## Example Output (Conceptual)
 
-Hidden States Sample
-[2 2 2 2 1 1 0 0 0 1 2 2 ... ]
+### PCA Explained Variance
+Usually dominated by PC1 reflecting broad level shifts.
 
-Represents market regimes such as:
-0 → Calm
-1 → Volatile
-2 → Stress
+### Sample HMM States
+```
+[2 2 2 1 1 0 0 0 1 2 ...]
+```
 
-(Exact interpretation requires Day 2+ features.)
+Interpretation (to be refined in Day 2+):
+- **0 — Calm**
+- **1 — Medium Volatility**
+- **2 — Stress**
 
-Roadmap (Next Steps)
-Day 2 — Feature Expansion
-Add volatility indices (VIX, UKVOL)
-Add macro indicators (inflation, unemployment, PMI)
-Add yield curve slope: 10Y–2Y
-Combine all into multi-dimensional HMM
+---
 
-Day 3 — Regime Visualisation
-FTSE chart coloured by hidden regime
-Transition matrix + stationary probabilities
+## Roadmap
 
-Day 4 — Backtesting
-Strategy rules per regime
-Performance metrics: Sharpe, drawdown
+### Day 2 — Multi-factor Input
+- Add FTSE volatility  
+- Add macro factors (CPI, PMI, unemployment)  
+- Construct multi‑dimensional HMM input  
 
-Day 5 — Package & API
-Convert project into pip-installable package
-Create CLI commands
-Add Docker support
+### Day 3 — Regime Visualisation
+- Regime‑coloured FTSE chart  
+- Transition matrices & stationary probabilities  
 
-Why This Project Matters
+### Day 4 — Backtesting
+- Regime‑based asset allocation rules  
+- Sharpe, drawdown, turnover metrics  
 
-Market regime detection is used by:
-Quant hedge funds
-Asset managers
-Risk management teams
-Macro researchers
+### Day 5 — Packaging
+- Publish as Python package  
+- Add command‑line interface  
+- Add Docker container  
 
-This project demonstrates:
-Structured engineering
-Feature extraction
-Time-series modelling
-PCA + HMM workflow
-Clean reproducible code
+---
 
-This repo will expand significantly over time.
-Pull requests and ideas are welcome.
+## Academic Relevance
+This project follows frameworks used in empirical macro‑finance and term‑structure modelling literature.  
+It provides an open‑source foundation for:
 
-License
-MIT License — free to use and modify.
+- yield‑curve modelling  
+- regime‑switching analytics  
+- systematic trading research  
+- risk‑state identification  
+
+---
+
+## License
+MIT License. Free for research, academic, and commercial use.
+
