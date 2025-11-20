@@ -1,0 +1,45 @@
+# -----------------------------
+# Python / Bytecode
+# -----------------------------
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+
+# -----------------------------
+# Virtual Environments
+# -----------------------------
+venv/
+env/
+.venv/
+
+# -----------------------------
+# VS Code
+# -----------------------------
+.vscode/
+.code-workspace
+
+# -----------------------------
+# Logs / Cache / Temp
+# -----------------------------
+*.log
+*.tmp
+.cache/
+
+# -----------------------------
+# Jupyter
+# -----------------------------
+.ipynb_checkpoints/
+
+# -----------------------------
+# Operating System Files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Data / Results (Optional)
+# If you want to version control them, delete below
+# -----------------------------
+data/
+results/
